@@ -1,37 +1,21 @@
 <?php 
-require_once("connection.php");
-$id = $_GET['id']; 
-$type_of_cart=$_GET['type_of_cart'];
-$quantity=$_GET['quantity'];
-echo $quantity;
+require_once("helpers.php");
 
-stopped here , should do a function that  saves the cart process
-// // $itemcode=$_GET['item_code'];
-// // $name=$_GET['name'];
-// // $buying_price=$_GET['buying_price'];
-// // $selling_price=$_GET['selling_price'];
-// // $size=$_GET['size'];
-// // $diameter=$_GET['diameter'];
-// // $brand=$_GET['brand'];
-// // $material=$_GET['material'];
-// // $description=$_GET['description'];
-// // $country_of_origin=$_GET['country_of_origin'];
-// // $ministry_code=$_GET['ministry_code'];
-// $q="UPDATE items_in_".$type_of_cart." SET ";
-// mysqli_query($conn,$q);
-// echo "<td>".$itemcode."</td>";
-// echo "<td>".$name."</td>";
-// echo "<td>".$buying_price."</td>";
-// echo "<td>".$selling_price."</td>";
-// echo "<td>".$size."</td>";
-// echo "<td>".$diameter."</td>";
-// echo "<td>".$brand."</td>";
-// echo "<td>".$material."</td>";
-// echo "<td>".$description."</td>";
-// echo "<td>".$country_of_origin."</td>";
-// echo "<td>".$ministry_code."</td>";
-// echo "<td><button class='editbutton' onclick='get_edit_row_items(".$id.")'>Edit</button></td>";
-// echo "<td><button class='deletebutton' onclick='delete_items(".$id.")'>Delete</button></td>";
+$id = request_int($_GET, 'id');
+$type_of_cart = request_value($_GET, 'type_of_cart');
+$quantity = request_int($_GET, 'quantity', 1);
+
+$allowed_tables = [
+    'purchase_cart' => 'items_in_purchase_cart',
+    'sell_cart' => 'items_in_sell_cart',
+];
+
+if ($id <= 0 || $quantity <= 0 || !isset($allowed_tables[$type_of_cart])) {
+    http_response_code(400);
+    echo 'Invalid cart update';
+    exit;
+}
+
+db_execute($conn, "UPDATE {$allowed_tables[$type_of_cart]} SET quantity=? WHERE items_in_cart_id=?", "ii", [$quantity, $id]);
+echo h($quantity);
 ?>
-
-

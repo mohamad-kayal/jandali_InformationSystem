@@ -32,12 +32,12 @@ window.location.replace("index.php");
 
 <?php
 if(isset($_POST['save'])){
-  $username=$_POST['username'];
+  $username=request_value($_POST, 'username');
   $password=$_POST['password'];
   $password1=$_POST['password1'];
-  $address=$_POST['address'];
-  $phone__number=$_POST['phonenumber'];
-  $role_id=$_POST['typeofuser'];
+  $address=request_value($_POST, 'address');
+  $phone__number=request_value($_POST, 'phonenumber');
+  $role_id=request_int($_POST, 'typeofuser');
   if($password==""){
     echo 'Please Enter A password for the new user';
   }
@@ -46,13 +46,11 @@ if(isset($_POST['save'])){
 
   }
   else {
-    $q="INSERT INTO user VALUES (NULL,'{$username}','{$password}','{$address}','{$phone__number}','{$role_id}')";
-    mysqli_query($conn,$q);
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    db_execute($conn, "INSERT INTO user VALUES (NULL,?,?,?,?,?)", "ssssi", [$username, $password_hash, $address, $phone__number, $role_id]);
     $last_id = $conn->insert_id;
-    $q="INSERT INTO purchase_cart VALUES (NULL , {$last_id})";
-    mysqli_query($conn,$q);
-    $q="INSERT INTO sell_cart VALUES (NULL, {$last_id})";
-    mysqli_query($conn,$q);
+    db_execute($conn, "INSERT INTO purchase_cart VALUES (NULL, ?)", "i", [$last_id]);
+    db_execute($conn, "INSERT INTO sell_cart VALUES (NULL, ?)", "i", [$last_id]);
     echo 'New User Added Successfully';
   }
 }

@@ -1,6 +1,6 @@
 
 <?php 
-include('connection.php');
+require_once('helpers.php');
 
 // supplier operations
 function add_supplier(){
@@ -300,16 +300,19 @@ function check_login(){
 	if(isset($_POST['login'])){
 		GLOBAL $conn;
 		session_start();
-$username= mysqli_real_escape_string($conn,$_POST['username']); 
-$password= mysqli_real_escape_string($conn,$_POST['password']); 
-		$sql="SELECT * FROM user WHERE password='$password' 
-				 AND username='$username'";
-		$result=mysqli_query($conn,$sql);
-		$nbrows=mysqli_num_rows($result);
-		if($nbrows == 1){
-			$row=mysqli_fetch_assoc($result);
+$username= request_value($_POST, 'username'); 
+$password= request_value($_POST, 'password'); 
+		$stmt = db_execute($conn, "SELECT * FROM user WHERE username=?", "s", [$username]);
+		$result = $stmt ? mysqli_stmt_get_result($stmt) : false;
+		$row = $result ? mysqli_fetch_assoc($result) : null;
+		if($row && (password_verify($password, $row['password']) || hash_equals($row['password'], $password))){
 			$_SESSION['user_id']=$row['user_id'];
+			if (!password_get_info($row['password'])['algo']) {
+				$new_hash = password_hash($password, PASSWORD_DEFAULT);
+				db_execute($conn, "UPDATE user SET password=? WHERE user_id=?", "si", [$new_hash, $row['user_id']]);
+			}
 			header('location: dashboard.php');
+			exit;
 		//login admin
 		// role id => privileges
 	}

@@ -1,20 +1,19 @@
 <?php 
-require_once("connection.php");
-$id = $_GET['id']; 
-$title = $_GET['title']; 
-$location = $_GET['location']; 
-$phone = $_GET['phone']; 
-$email = $_GET['email']; 
-$balance_usd = $_GET['balance_usd']; 
+require_once("helpers.php");
+$id = request_int($_GET, 'id'); 
+$title = request_value($_GET, 'title'); 
+$location = request_value($_GET, 'location'); 
+$phone = request_value($_GET, 'phone'); 
+$email = request_value($_GET, 'email'); 
+$balance_usd = request_value($_GET, 'balance_usd'); 
 
-$q="UPDATE supplier set title='{$title}', location='{$location}', phone_number='{$phone}', email='{$email}',  balance_usd='{$balance_usd}' WHERE supplier_id={$id}";
-mysqli_query($conn,$q);
+db_execute($conn, "UPDATE supplier SET title=?, location=?, phone_number=?, email=?, balance_usd=? WHERE supplier_id=?", "sssssi", [$title, $location, $phone, $email, $balance_usd, $id]);
 
-echo "<td>".$title."</td>";
-echo "<td>".$location."</td>";
-echo "<td>".$phone."</td>";
-echo "<td>".$email."</td>";
-echo "<td>".$balance_usd."</td>";
+echo "<td>".h($title)."</td>";
+echo "<td>".h($location)."</td>";
+echo "<td>".h($phone)."</td>";
+echo "<td>".h($email)."</td>";
+echo "<td>".h($balance_usd)."</td>";
 echo "<td><button class='editbutton' onclick='get_edit_row_suppliers(".$id.")'>Edit</button></td>";
 echo "<td><button class='deletebutton' onclick='delete_suppliers(".$id.")'>Delete</button></td>";
 ?>
