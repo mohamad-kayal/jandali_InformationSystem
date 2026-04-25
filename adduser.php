@@ -45,6 +45,9 @@ if(isset($_POST['save'])){
     echo 'The passwords should be identical';
 
   }
+  elseif(db_fetch_assoc($conn, "SELECT user_id FROM user WHERE username=?", "s", [$username])){
+    echo 'Username already exists';
+  }
   else {
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
     db_execute($conn, "INSERT INTO user VALUES (NULL,?,?,?,?,?)", "ssssi", [$username, $password_hash, $address, $phone__number, $role_id]);

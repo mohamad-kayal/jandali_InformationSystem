@@ -6,7 +6,7 @@ if (!$result) {
     die('Invoice not found');
 }
 ?>
-<form method="post" action="view_items_from_invoice.php";>
+<form method="post" action="view_items_from_invoice.php">
 <input type="text" hidden value="<?php echo h($invoice_id)?>" name="invoice_id">
 <input type="text" hidden value="<?php echo h($result['invoice_group'])?>" name="invoice_group">
 <input type="text" hidden value="<?php echo h($result['invoice_date_of_sale'])?>" name="invoice_date_of_sale">

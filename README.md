@@ -56,5 +56,6 @@ find . -maxdepth 1 -name '*.php' -print0 | xargs -0 -n1 php -l
 ## Security notes
 
 - Do not commit `.env` or real credentials.
+- Never use `APP_ENV=development` in production because it shows detailed database connection errors.
 - Existing legacy plain-text passwords are upgraded automatically after successful login.
 - More endpoints still need a future pass for CSRF tokens, authorization checks, and full prepared-statement coverage.
