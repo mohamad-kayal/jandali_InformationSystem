@@ -27,11 +27,10 @@ function db_execute($conn, $sql, $types = '', $params = [])
 	}
 
 	if ($types !== '' && !empty($params)) {
-		$refs = [];
-		foreach ($params as $key => $value) {
-			$refs[$key] = &$params[$key];
+		$refs = [$types];
+		for ($i = 0; $i < count($params); $i++) {
+			$refs[] = &$params[$i];
 		}
-		array_unshift($refs, $types);
 		call_user_func_array([$stmt, 'bind_param'], $refs);
 	}
 

@@ -8,7 +8,7 @@ $balance=request_value($_GET, 'balance');
 $discount=request_value($_GET, 'discount');
 db_execute($conn, "INSERT INTO client VALUES (NULL,?,?,?,?,?,?)", "ssssss", [$balance, $name, $mof, $address, $phonenumber, $discount]);
 $last_id = $conn->insert_id;		
-echo "<tr id=".h($last_id)." >";
+echo "<tr id=\"".h($last_id)."\" >";
 echo "<td>".h($name)."</td>";
 echo "<td>".h($phonenumber)."</td>";
 echo "<td>".h($address)."</td>";

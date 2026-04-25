@@ -19,7 +19,7 @@ db_execute(
     [$itemcode, $name, $buying_price, $selling_price, $size, $diameter, $brand, $material, $description, $country_of_origin, $stock, $ministry_code]
 );
 $last_id = $conn->insert_id;
-echo "<tr id=".h($last_id).">";
+echo "<tr id=\"".h($last_id)."\">";
 echo "<td>".h($itemcode)."</td>";
 echo "<td>".h($name)."</td>";
 echo "<td>".h($buying_price)."</td>";

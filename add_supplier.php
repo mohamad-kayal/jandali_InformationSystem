@@ -7,7 +7,7 @@ $email=request_value($_GET, 'email');
 $balance=request_value($_GET, 'balance');
 db_execute($conn, "INSERT INTO supplier VALUES (NULL,?,?,?,?,?)", "sssss", [$title, $location, $phone, $email, $balance]);
 $last_id = $conn->insert_id;
-echo "<tr id=".h($last_id).">";
+echo "<tr id=\"".h($last_id)."\">";
 echo "<td>".h($title)."</td>";
 echo "<td>".h($location)."</td>";
 echo "<td>".h($phone)."</td>";
