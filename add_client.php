@@ -15,8 +15,8 @@ echo "<td>".h($address)."</td>";
 echo "<td>".h($mof)."</td>";
 echo "<td>".h($balance)."</td>";
 echo "<td>".h($discount)."</td>";
-echo "<td><button onclick='get_edit_row_clients(". $last_id.")' class='editbutton'>Edit</button></td>";
-echo "<td><button  onclick='delete_clients(". $last_id.")' class='deletebutton'>Delete</button></td>";
+echo "<td><button onclick='get_edit_row_clients(".h($last_id).")' class='editbutton'>Edit</button></td>";
+echo "<td><button  onclick='delete_clients(".h($last_id).")' class='deletebutton'>Delete</button></td>";
 echo "</tr>";
 
 

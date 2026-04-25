@@ -14,7 +14,7 @@ echo "<td>".h($location)."</td>";
 echo "<td>".h($phone)."</td>";
 echo "<td>".h($email)."</td>";
 echo "<td>".h($balance_usd)."</td>";
-echo "<td><button class='editbutton' onclick='get_edit_row_suppliers(".$id.")'>Edit</button></td>";
-echo "<td><button class='deletebutton' onclick='delete_suppliers(".$id.")'>Delete</button></td>";
+echo "<td><button class='editbutton' onclick='get_edit_row_suppliers(".h($id).")'>Edit</button></td>";
+echo "<td><button class='deletebutton' onclick='delete_suppliers(".h($id).")'>Delete</button></td>";
 ?>
 

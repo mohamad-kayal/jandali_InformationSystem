@@ -29,7 +29,7 @@ echo "<td>".h($material)."</td>";
 echo "<td>".h($description)."</td>";
 echo "<td>".h($country_of_origin)."</td>";
 echo "<td>".h($ministry_code)."</td>";
-echo "<td><button class='editbutton' onclick='get_edit_row_items(".$id.")'>Edit</button></td>";
-echo "<td><button class='deletebutton' onclick='delete_items(".$id.")'>Delete</button></td>";
+echo "<td><button class='editbutton' onclick='get_edit_row_items(".h($id).")'>Edit</button></td>";
+echo "<td><button class='deletebutton' onclick='delete_items(".h($id).")'>Delete</button></td>";
 ?>
 

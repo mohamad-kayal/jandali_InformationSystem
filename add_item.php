@@ -31,7 +31,7 @@ echo "<td>".h($material)."</td>";
 echo "<td>".h($description)."</td>";
 echo "<td>".h($country_of_origin)."</td>";
 echo "<td>".h($ministry_code)."</td>";
-echo "<td><button onclick='get_edit_row_items(".$last_id.")'  class='editbutton'>Edit</button></td>";
-echo "<td><button onclick='delete_items(".$last_id.")' class='deletebutton'>Delete</button></td>";
+echo "<td><button onclick='get_edit_row_items(".h($last_id).")'  class='editbutton'>Edit</button></td>";
+echo "<td><button onclick='delete_items(".h($last_id).")' class='deletebutton'>Delete</button></td>";
 echo "</tr>";
 ?>

@@ -19,7 +19,7 @@ echo "<td>".h($address)."</td>";
 echo "<td>".h($mof)."</td>";
 echo "<td>".h($balance_usd)."</td>";
 echo "<td>".h($discount)."</td>";
-echo "<td><button class='editbutton' onclick='get_edit_row_clients(".$id.")'>Edit</button></td>";
-echo "<td><button class='deletebutton' onclick='delete_clients(".$id.")'>Delete</button></td>";
+echo "<td><button class='editbutton' onclick='get_edit_row_clients(".h($id).")'>Edit</button></td>";
+echo "<td><button class='deletebutton' onclick='delete_clients(".h($id).")'>Delete</button></td>";
 ?>
 

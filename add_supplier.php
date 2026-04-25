@@ -13,8 +13,8 @@ echo "<td>".h($location)."</td>";
 echo "<td>".h($phone)."</td>";
 echo "<td>".h($email)."</td>";
 echo "<td>".h($balance)."</td>";
-echo "<td><button class='editbutton' onclick='get_edit_row_suppliers(".$last_id.")'>Edit</button></td>";
-echo "<td><button class='deletebutton' onclick='delete_suppliers(".$last_id.")'>Delete</button></td>";
+echo "<td><button class='editbutton' onclick='get_edit_row_suppliers(".h($last_id).")'>Edit</button></td>";
+echo "<td><button class='deletebutton' onclick='delete_suppliers(".h($last_id).")'>Delete</button></td>";
 echo "</tr>";
 
 
