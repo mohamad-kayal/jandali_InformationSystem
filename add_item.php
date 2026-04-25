@@ -11,13 +11,13 @@ $brand=request_value($_POST, 'brand');
 $material=request_value($_POST, 'material');
 $description=request_value($_POST, 'description');
 $country_of_origin=request_value($_POST, 'country_of_origin');
-$stock=request_value($_POST, 'stock');
+$stock=request_int($_POST, 'stock');
 $ministry_code=request_value($_POST, 'ministry_code');
 $item_params = [$itemcode, $name, $buying_price, $selling_price, $size, $diameter, $brand, $material, $description, $country_of_origin, $stock, $ministry_code];
 db_execute(
     $conn,
     "INSERT INTO item VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?,?)",
-    str_repeat('s', count($item_params)),
+    "ssssssssssis",
     $item_params
 );
 $last_id = $conn->insert_id;

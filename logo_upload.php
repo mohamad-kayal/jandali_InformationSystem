@@ -64,7 +64,7 @@ if ($uploadOk == 0) {
     }
 }
 if ($final_dir !== '') {
-    db_execute($conn, "INSERT INTO logo VALUES (NULL, ?, ?)", "ss", ['someimg', $final_dir]);
+    db_execute($conn, "INSERT INTO logo VALUES (NULL, ?, ?)", "ss", [request_value($_POST, 'logo_name', 'someimg'), $final_dir]);
 }
 }
 

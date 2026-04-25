@@ -17,7 +17,7 @@ $item_params = [$itemcode, $name, $buying_price, $selling_price, $size, $diamete
 db_execute(
     $conn,
     "UPDATE item SET item_code=?, name=?, buying_price=?, selling_price=?, size=?, diameter=?, brand=?, material=?, description=?, country_of_origin=?, ministry_code=? WHERE item_id=?",
-    str_repeat('s', count($item_params) - 1) . 'i',
+    "sssssssssssi",
     $item_params
 );
 echo "<td>".h($itemcode)."</td>";

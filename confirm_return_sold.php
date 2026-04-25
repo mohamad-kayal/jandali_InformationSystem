@@ -56,7 +56,7 @@ echo '<table id="tablePreview" class="table table-striped">
 // table goes here 
 while ($row=mysqli_fetch_assoc($sell_result)) {
  if((int) $_POST['quantity_returned'][$i]!=0){
-  $item_code=request_value($_POST['item_code'], $i);
+  $item_code=(string) ($_POST['item_code'][$i] ?? '');
   $item=db_fetch_assoc($conn, "SELECT * from item where item_code=?", "s", [$item_code]);
   $quantity_returned=(int) $_POST['quantity_returned'][$i];
   $total_price=$item['selling_price']*$quantity_returned;

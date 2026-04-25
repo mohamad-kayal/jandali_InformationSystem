@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS user (
   username VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   address VARCHAR(255) DEFAULT '',
-  phone_number VARCHAR(50) DEFAULT '',
+  phone__number VARCHAR(50) DEFAULT '',
   role_id INT NOT NULL DEFAULT 1
 );
 
@@ -134,5 +134,6 @@ CREATE TABLE IF NOT EXISTS balance (
 
 CREATE TABLE IF NOT EXISTS logo (
   logo_id INT AUTO_INCREMENT PRIMARY KEY,
-  path VARCHAR(255) NOT NULL
+  logo_name VARCHAR(255) NOT NULL,
+  directory VARCHAR(255) NOT NULL
 );
