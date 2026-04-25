@@ -5,9 +5,9 @@ require_post_with_csrf();
 $id = request_int($_POST, 'id');
 $type_of_cart = request_value($_POST, 'type_of_cart');
 $quantity = request_int($_POST, 'quantity', 0);
-$user_id = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 0;
+$user_id = require_authenticated_user();
 
-if ($id <= 0 || $quantity <= 0 || $user_id <= 0) {
+if ($id <= 0 || $quantity <= 0) {
     http_response_code(400);
     echo 'Invalid cart ID or quantity';
     exit;

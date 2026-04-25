@@ -1,7 +1,7 @@
 <?php 
 require_once('helpers.php');
 require_post_with_csrf();
-$user_id=(int) $_SESSION['user_id'];
+$user_id=require_authenticated_user();
 $item_id=request_int($_POST, 'item_id');
 $quantity=request_int($_POST, 'quantity');
 $cart=db_fetch_assoc($conn, "SELECT * FROM purchase_cart WHERE user_id=?", "i", [$user_id]);

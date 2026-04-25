@@ -56,6 +56,17 @@ function require_post_with_csrf()
 	}
 }
 
+function require_authenticated_user()
+{
+	ensure_session_started();
+	if (empty($_SESSION['user_id'])) {
+		http_response_code(401);
+		echo 'Authentication required';
+		exit;
+	}
+	return (int) $_SESSION['user_id'];
+}
+
 /**
  * Prepare and execute a SQL statement with optional bound parameters.
  * Returns the statement handle on success or false on failure.

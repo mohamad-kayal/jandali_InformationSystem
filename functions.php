@@ -309,13 +309,9 @@ $password= request_value($_POST, 'password');
 		$stmt = db_execute($conn, "SELECT * FROM user WHERE username=?", "s", [$username]);
 		$result = $stmt ? mysqli_stmt_get_result($stmt) : false;
 		$row = $result ? mysqli_fetch_assoc($result) : null;
-		if($row && (password_verify($password, $row['password']) || hash_equals($row['password'], $password))){
+		if($row && password_verify($password, $row['password'])){
 			session_regenerate_id(true);
 			$_SESSION['user_id']=$row['user_id'];
-			if (!password_get_info($row['password'])['algo']) {
-				$new_hash = password_hash($password, PASSWORD_DEFAULT);
-				db_execute($conn, "UPDATE user SET password=? WHERE user_id=?", "si", [$new_hash, $row['user_id']]);
-			}
 			header('location: dashboard.php');
 			exit;
 		//login admin

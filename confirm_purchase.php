@@ -8,7 +8,7 @@ $date = date('d/m/Y', time());
 $supplier_id=request_int($_POST, 'supplier_id');
 $amount_paid=request_value($_POST, 'amount_paid');
 $total_price=0;
-$user_id=(int) $_SESSION['user_id'];
+$user_id=require_authenticated_user();
 $quantity=0;
 $final_price=0;
 $cart = db_fetch_assoc($conn, "SELECT cart_id FROM purchase_cart WHERE user_id=?", "i", [$user_id]);
@@ -16,8 +16,7 @@ $cart_id = $cart ? (int) $cart['cart_id'] : 0;
 $items_stmt=db_execute($conn, "SELECT quantity as count, item_id FROM items_in_purchase_cart WHERE cart_id=?", "i", [$cart_id]);
 $items_in_cart=$items_stmt ? mysqli_stmt_get_result($items_stmt) : false;
 $image_path=request_value($_POST, 'image');
-$invoice_group=db_fetch_assoc($conn, "SELECT COALESCE(MAX(purchase_id), ?) + ? AS next_invoice_group FROM purchase", "ii", [0, 1]);
-$invoice_group_id = (int) $invoice_group['next_invoice_group'];
+$invoice_group_id = date('YmdHis') . '-' . $user_id;
 echo '<!DOCTYPE html>
         <html lang="en">
         <head>

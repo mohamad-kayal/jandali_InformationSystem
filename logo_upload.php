@@ -5,6 +5,7 @@
     <?php require_once('helpers.php'); echo csrf_input(); ?>
     Select image to upload:
     <input type="file" name="fileToUpload" id="fileToUpload">
+    <input type="text" name="logo_name" id="logo_name" placeholder="Logo name" value="someimg">
     <input type="submit" value="Upload Image" name="submit_image">
 </form>
 </body>
