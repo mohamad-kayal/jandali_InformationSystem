@@ -13,7 +13,6 @@ window.location.replace("index.php");
 }
 $user_id = (int) $_SESSION['user_id'];
 $user_details = db_fetch_assoc($conn, "SELECT * FROM user WHERE user_id=?", "i", [$user_id]);
-$user_phone_column = is_array($user_details) && array_key_exists('phone__number', $user_details) ? 'phone__number' : 'phone_number';
 ?>
 
 <div class="accountcontainer">
@@ -24,7 +23,7 @@ $user_phone_column = is_array($user_details) && array_key_exists('phone__number'
   <span>New Password </span><br><input class="accountinputs" type="password" name="password" value=""><br>
   <span>Confirm Password </span><br><input class="accountinputs" type="password" name="password2" value=""><br>
   <span>Address </span><br> <input  class="accountinputs" type="text" name="address" value="<?php echo h($user_details['address'])  ?> "><br>
-  <span>Phone Number </span><br><input class="accountinputs" type="text" name="phonenumber" value="<?php echo h($user_details[$user_phone_column] ?? '')  ?> "><br>
+  <span>Phone Number </span><br><input class="accountinputs" type="text" name="phonenumber" value="<?php echo h($user_details['phone_number'] ?? '')  ?> "><br>
   <input type="submit" class="savebutton" name="save" value="Save"><br>
   </form>
   <form action="<?php echo $_SERVER['PHP_SELF']  ?> " method="post" enctype="multipart/form-data">
@@ -52,7 +51,7 @@ $password2=request_value($_POST, 'password2');
 $address=request_value($_POST, 'address');
 $phone__number=request_value($_POST, 'phonenumber');
 if($password==""){
-  db_execute($conn, "UPDATE user SET username=?, address=?, {$user_phone_column}=? WHERE user_id=?", "sssi", [$username, $address, $phone__number, $user_id]);
+  db_execute($conn, "UPDATE user SET username=?, address=?, phone_number=? WHERE user_id=?", "sssi", [$username, $address, $phone__number, $user_id]);
 ?>
 
 <script> 
@@ -66,7 +65,7 @@ else {
   }
   else{
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
-    db_execute($conn, "UPDATE user SET username=?, password=?, address=?, {$user_phone_column}=? WHERE user_id=?", "ssssi", [$username, $password_hash, $address, $phone__number, $user_id]);
+    db_execute($conn, "UPDATE user SET username=?, password=?, address=?, phone_number=? WHERE user_id=?", "ssssi", [$username, $password_hash, $address, $phone__number, $user_id]);
 
   ?>
   

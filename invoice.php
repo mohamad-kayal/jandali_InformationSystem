@@ -87,7 +87,7 @@ echo '<img src="'.h($image_path).'" id="company_logo" style="width: 27em; height
         echo '<td>'.h($item_row['selling_price']).'</td>';
         echo '<td>'.h($total_price).'</td>';
         echo '</tr>';
-        db_execute($conn, "INSERT INTO sell VALUES (NULL, ?, ?, ?, ?, ?)", "isssi", [$client_id, $item_row['item_code'], $invoice_group_id, $item_row['selling_price'], $quantity]);
+        db_execute($conn, "INSERT INTO sell (client_id, item_code, invoice_group, price, quantity) VALUES (?, ?, ?, ?, ?)", "isssi", [$client_id, $item_row['item_code'], $invoice_group_id, $item_row['selling_price'], $quantity]);
         db_execute($conn, "DELETE FROM items_in_sell_cart WHERE item_id=? AND cart_id=?", "ii", [$item['item_id'], $cart_id]);
         db_execute($conn, "UPDATE item SET stock=stock-? WHERE item_id=?", "ii", [$quantity, $item['item_id']]);
       }

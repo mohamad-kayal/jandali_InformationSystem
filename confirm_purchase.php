@@ -81,7 +81,7 @@ while ($item=mysqli_fetch_assoc($items_in_cart)) {
     echo '</tr>';
     db_execute($conn, "DELETE FROM items_in_purchase_cart WHERE item_id=? AND cart_id=?", "ii", [$item['item_id'], $cart_id]);
     $final_price+=$total_price;
-    db_execute($conn, "INSERT INTO purchase VALUES (NULL, ?, ?, ?, ?, ?, ?)", "isssii", [$supplier_id, $item_row['item_code'], $invoice_group_id, $item_row['selling_price'], $quantity, $user_id]);
+    db_execute($conn, "INSERT INTO purchase (supplier_id, item_code, invoice_group, price_per_item, quantity, user_id) VALUES (?, ?, ?, ?, ?, ?)", "isssii", [$supplier_id, $item_row['item_code'], $invoice_group_id, $item_row['selling_price'], $quantity, $user_id]);
     db_execute($conn, "UPDATE item SET stock=stock+? WHERE item_id=?", "ii", [$quantity, $item['item_id']]);
 }
 echo ' </tbody>

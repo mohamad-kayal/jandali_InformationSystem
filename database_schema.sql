@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS user (
   username VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   address VARCHAR(255) DEFAULT '',
-  phone__number VARCHAR(50) DEFAULT '',
+  phone_number VARCHAR(50) DEFAULT '',
   role_id INT NOT NULL DEFAULT 1
 );
 
@@ -101,28 +101,27 @@ CREATE TABLE IF NOT EXISTS purchase_invoice (
 CREATE TABLE IF NOT EXISTS sell (
   sell_id INT AUTO_INCREMENT PRIMARY KEY,
   client_id INT NULL,
-  item_id INT NULL,
+  item_code VARCHAR(100) NOT NULL,
   price DECIMAL(12,4) NOT NULL DEFAULT 0,
   date_of_sale DATETIME NULL,
   payment_type VARCHAR(50) DEFAULT '',
   amount DECIMAL(12,2) NOT NULL DEFAULT 0,
   quantity INT NOT NULL DEFAULT 1,
   invoice_group VARCHAR(100) DEFAULT '',
-  FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE SET NULL,
-  FOREIGN KEY (item_id) REFERENCES item(item_id) ON DELETE SET NULL
+  FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS purchase (
   purchase_id INT AUTO_INCREMENT PRIMARY KEY,
   supplier_id INT NULL,
-  item_id INT NULL,
+  item_code VARCHAR(100) NOT NULL,
   price_per_item DECIMAL(12,4) NOT NULL DEFAULT 0,
   date_of_purchase DATETIME NULL,
   amount DECIMAL(12,2) NOT NULL DEFAULT 0,
   quantity INT NOT NULL DEFAULT 1,
+  user_id INT NULL,
   invoice_group VARCHAR(100) DEFAULT '',
-  FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id) ON DELETE SET NULL,
-  FOREIGN KEY (item_id) REFERENCES item(item_id) ON DELETE SET NULL
+  FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS balance (

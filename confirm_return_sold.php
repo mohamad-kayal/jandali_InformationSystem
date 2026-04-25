@@ -7,6 +7,7 @@ $date = date('d/m/Y', time());
 $invoice_group=request_value($_POST, 'invoice_group');
 $invoice_group_for_number=db_fetch_assoc($conn, "SELECT invoice_id FROM sell_invoice order by invoice_id DESC limit 1");
 $final_price=0;
+$returned_client_id=0;
 $sell_stmt=db_execute($conn, "SELECT * from sell where invoice_group=?", "s", [$invoice_group]);
 $sell_result=$sell_stmt ? mysqli_stmt_get_result($sell_stmt) : false;
 $i=0;
@@ -62,6 +63,7 @@ while ($row=mysqli_fetch_assoc($sell_result)) {
   $total_price=$item['selling_price']*$quantity_returned;
   $sell_id=(int) $_POST['sell_id'][$i];
   $client_id=(int) $_POST['client_id'][$i];
+  $returned_client_id=$client_id;
  echo '<tr>';
   echo '<td>'.h($item['item_code']).'</td>';
   echo '<td>'.h($item['brand']).'</td>';
@@ -73,10 +75,12 @@ while ($row=mysqli_fetch_assoc($sell_result)) {
  echo '</tr>';
 
     db_execute($conn, "UPDATE sell SET quantity=quantity-? WHERE sell_id=?", "ii", [$quantity_returned, $sell_id]);
-    db_execute($conn, "UPDATE client SET balance_usd=balance_usd-? WHERE client_id=?", "si", [$final_price, $client_id]);
     db_execute($conn, "UPDATE item SET stock=stock+? WHERE item_code=?", "is", [$quantity_returned, $item_code]);
 }
     $i++;
+}
+if ($final_price > 0 && $returned_client_id > 0) {
+    db_execute($conn, "UPDATE client SET balance_usd=balance_usd-? WHERE client_id=?", "si", [$final_price, $returned_client_id]);
 }
 
 echo '

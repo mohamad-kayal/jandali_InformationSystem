@@ -7,6 +7,7 @@ $date = date('d/m/Y', time());
 $invoice_group=request_value($_POST, 'invoice_group');
 $invoice_group_for_number=db_fetch_assoc($conn, "SELECT invoice_id FROM purchase_invoice order by invoice_id DESC limit 1");
 $final_price=0;
+$returned_supplier_id=0;
 $purchase_stmt=db_execute($conn, "SELECT * from purchase where invoice_group=?", "s", [$invoice_group]);
 $purchse_result=$purchase_stmt ? mysqli_stmt_get_result($purchase_stmt) : false;
 $i=0;
@@ -62,6 +63,7 @@ while ($row=mysqli_fetch_assoc($purchse_result)) {
   $total_price=$item['selling_price']*$quantity_returned;
   $purchase_id=(int) $_POST['purchase_id'][$i];
   $supplier_id=(int) $_POST['supplier_id'][$i];
+  $returned_supplier_id=$supplier_id;
  echo '<tr>';
   echo '<td>'.h($item['item_code']).'</td>';
   echo '<td>'.h($item['brand']).'</td>';
@@ -73,10 +75,12 @@ while ($row=mysqli_fetch_assoc($purchse_result)) {
  echo '</tr>';
 
     db_execute($conn, "UPDATE purchase SET quantity=quantity-? WHERE purchase_id=?", "ii", [$quantity_returned, $purchase_id]);
-    db_execute($conn, "UPDATE supplier SET balance_usd=balance_usd-? WHERE supplier_id=?", "si", [$final_price, $supplier_id]);
     db_execute($conn, "UPDATE item SET stock=stock-? WHERE item_code=?", "is", [$quantity_returned, $item_code]);
 }
     $i++;
+}
+if ($final_price > 0 && $returned_supplier_id > 0) {
+    db_execute($conn, "UPDATE supplier SET balance_usd=balance_usd-? WHERE supplier_id=?", "si", [$final_price, $returned_supplier_id]);
 }
 
 echo '

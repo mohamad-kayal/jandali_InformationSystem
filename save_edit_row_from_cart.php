@@ -4,7 +4,7 @@ require_post_with_csrf();
 
 $id = request_int($_POST, 'id');
 $type_of_cart = request_value($_POST, 'type_of_cart');
-$quantity = request_int($_POST, 'quantity', 1);
+$quantity = request_int($_POST, 'quantity', 0);
 $user_id = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 0;
 
 if ($id <= 0 || $quantity <= 0 || $user_id <= 0) {
