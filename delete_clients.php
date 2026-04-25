@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once("connection.php");
-$id=$_GET["id"];
-$q="DELETE FROM client WHERE client_id=".$id;
-if ($result=mysqli_query($conn,$q)){
+require_once("helpers.php");
+require_post_with_csrf();
+$id=request_int($_POST, "id");
+if ($id > 0 && db_execute($conn, "DELETE FROM client WHERE client_id=?", "i", [$id])){
 	echo "success";
 }
 ?>

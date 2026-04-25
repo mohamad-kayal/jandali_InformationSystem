@@ -1,6 +1,6 @@
 
 <?php 
-include('connection.php');
+require_once('helpers.php');
 
 // supplier operations
 function add_supplier(){
@@ -299,17 +299,21 @@ function return_sold_items(){
 function check_login(){
 	if(isset($_POST['login'])){
 		GLOBAL $conn;
-		session_start();
-$username= mysqli_real_escape_string($conn,$_POST['username']); 
-$password= mysqli_real_escape_string($conn,$_POST['password']); 
-		$sql="SELECT * FROM user WHERE password='$password' 
-				 AND username='$username'";
-		$result=mysqli_query($conn,$sql);
-		$nbrows=mysqli_num_rows($result);
-		if($nbrows == 1){
-			$row=mysqli_fetch_assoc($result);
+		if (!verify_csrf($_POST)) {
+			echo "<span>invalid request</span>";
+			return;
+		}
+		ensure_session_started();
+$username= request_value($_POST, 'username'); 
+$password= request_value($_POST, 'password'); 
+		$stmt = db_execute($conn, "SELECT * FROM user WHERE username=?", "s", [$username]);
+		$result = $stmt ? mysqli_stmt_get_result($stmt) : false;
+		$row = $result ? mysqli_fetch_assoc($result) : null;
+		if($row && password_verify($password, $row['password'])){
+			session_regenerate_id(true);
 			$_SESSION['user_id']=$row['user_id'];
 			header('location: dashboard.php');
+			exit;
 		//login admin
 		// role id => privileges
 	}

@@ -1,37 +1,39 @@
 <?php 
-require_once("connection.php");
-$id = $_GET['id']; 
-$type_of_cart=$_GET['type_of_cart'];
-$quantity=$_GET['quantity'];
-echo $quantity;
+require_once("helpers.php");
+require_post_with_csrf();
 
-stopped here , should do a function that  saves the cart process
-// // $itemcode=$_GET['item_code'];
-// // $name=$_GET['name'];
-// // $buying_price=$_GET['buying_price'];
-// // $selling_price=$_GET['selling_price'];
-// // $size=$_GET['size'];
-// // $diameter=$_GET['diameter'];
-// // $brand=$_GET['brand'];
-// // $material=$_GET['material'];
-// // $description=$_GET['description'];
-// // $country_of_origin=$_GET['country_of_origin'];
-// // $ministry_code=$_GET['ministry_code'];
-// $q="UPDATE items_in_".$type_of_cart." SET ";
-// mysqli_query($conn,$q);
-// echo "<td>".$itemcode."</td>";
-// echo "<td>".$name."</td>";
-// echo "<td>".$buying_price."</td>";
-// echo "<td>".$selling_price."</td>";
-// echo "<td>".$size."</td>";
-// echo "<td>".$diameter."</td>";
-// echo "<td>".$brand."</td>";
-// echo "<td>".$material."</td>";
-// echo "<td>".$description."</td>";
-// echo "<td>".$country_of_origin."</td>";
-// echo "<td>".$ministry_code."</td>";
-// echo "<td><button class='editbutton' onclick='get_edit_row_items(".$id.")'>Edit</button></td>";
-// echo "<td><button class='deletebutton' onclick='delete_items(".$id.")'>Delete</button></td>";
+$id = request_int($_POST, 'id');
+$type_of_cart = request_value($_POST, 'type_of_cart');
+$quantity = request_int($_POST, 'quantity', 0);
+$user_id = require_authenticated_user();
+
+if ($id <= 0 || $quantity <= 0) {
+    http_response_code(400);
+    echo 'Invalid cart ID or quantity';
+    exit;
+}
+
+switch ($type_of_cart) {
+    case 'purchase_cart':
+        db_execute(
+            $conn,
+            "UPDATE items_in_purchase_cart SET quantity=? WHERE item_id=? AND cart_id IN (SELECT cart_id FROM purchase_cart WHERE user_id=?)",
+            "iii",
+            [$quantity, $id, $user_id]
+        );
+        break;
+    case 'sell_cart':
+        db_execute(
+            $conn,
+            "UPDATE items_in_sell_cart SET quantity=? WHERE item_id=? AND cart_id IN (SELECT cart_id FROM sell_cart WHERE user_id=?)",
+            "iii",
+            [$quantity, $id, $user_id]
+        );
+        break;
+    default:
+        http_response_code(400);
+        echo 'Invalid cart type';
+        exit;
+}
+echo h($quantity);
 ?>
-
-

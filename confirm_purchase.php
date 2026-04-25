@@ -1,22 +1,22 @@
 <?php 
-include('connection.php');
-session_start();
+require_once('helpers.php');
+require_post_with_csrf();
 
 $sell_date = date('Y/m/d h:i:s', time());
 $date = date('d/m/Y', time());
 
-$supplier_id=$_POST['supplier_id'];
-$amount_paid=$_POST['amount_paid'];
+$supplier_id=request_int($_POST, 'supplier_id');
+$amount_paid=request_value($_POST, 'amount_paid');
 $total_price=0;
-$user_id=$_SESSION['user_id'];
+$user_id=require_authenticated_user();
 $quantity=0;
 $final_price=0;
-$q="SELECT quantity as count , item_id FROM `items_in_purchase_cart` ";
-// $inv_number=mysqli_fetch_assoc(mysqli_query($conn,$q));
-$items_in_cart=mysqli_query($conn,$q);
-$image_path=$_POST['image'];
-$q="SELECT purchase_id FROM purchase order by purchase_id DESC limit 1";
-$invoice_group=mysqli_fetch_assoc(mysqli_query($conn,$q));
+$cart = db_fetch_assoc($conn, "SELECT cart_id FROM purchase_cart WHERE user_id=?", "i", [$user_id]);
+$cart_id = $cart ? (int) $cart['cart_id'] : 0;
+$items_stmt=db_execute($conn, "SELECT quantity as count, item_id FROM items_in_purchase_cart WHERE cart_id=?", "i", [$cart_id]);
+$items_in_cart=$items_stmt ? mysqli_stmt_get_result($items_stmt) : false;
+$image_path=request_value($_POST, 'image');
+$invoice_group_id = date('YmdHis') . '-' . $user_id;
 echo '<!DOCTYPE html>
         <html lang="en">
         <head>
@@ -33,7 +33,7 @@ echo '<!DOCTYPE html>
 </head>
 <body>
   <nav>';
-  echo '<img src="'.$image_path.'" id="company_logo" style="width: 27em; height: 16em;" alt="Company Logo" class="icon">';
+  echo '<img src="'.h($image_path).'" id="company_logo" style="width: 27em; height: 16em;" alt="Company Logo" class="icon">';
    echo' <div class="companyinfo">
         <span>Address: </span><span
         id="company_address">LEBANON-TRIPOLI<br>Boulivar Street<br>Front of Galatasaray vs Goovernment<br>
@@ -43,7 +43,7 @@ echo '<!DOCTYPE html>
         echo ' <div class="container">
         <div class="invoiceinfo">
         <span>Invoice Date: </span><span id="invoice_date">'.$date.'</span><br>
-        <span>Invoice Number: </span><span id="invoice_nb">'.$invoice_group['purchase_id'].'</span><br>
+        <span>Invoice Number: </span><span id="invoice_nb">'.h($invoice_group_id).'</span><br>
         </div>
         <h3>Purchse Invoice</h3>
 
@@ -64,41 +64,31 @@ echo '<!DOCTYPE html>
 <tbody>';
 
 while ($item=mysqli_fetch_assoc($items_in_cart)) {
-    $q='SELECT * FROM item WHERE item_id='.$item['item_id'];
-    $item_row=mysqli_fetch_assoc(mysqli_query($conn,$q));
+    $item_row=db_fetch_assoc($conn, "SELECT * FROM item WHERE item_id=?", "i", [$item['item_id']]);
     $quantity=$item['count'];
     $total_price=$quantity*$item_row['buying_price'];
 
     echo '<tr>';
-    echo '<td>'.$item_row['name'].'</td>';
+    echo '<td>'.h($item_row['name']).'</td>';
     echo '<td></td>';
-    echo  '<td>'.$item_row['item_code'].'</td>';
-    echo '<td>'.$item_row['brand'].'</td>';
-    echo '<td>'.$item_row['country_of_origin'].'</td>';
-    echo '<td>'.$quantity.'</td>';
-    echo '<td>'.$item_row['selling_price'].'</td>';
-    echo '<td>'.$total_price.'</td>';
+    echo  '<td>'.h($item_row['item_code']).'</td>';
+    echo '<td>'.h($item_row['brand']).'</td>';
+    echo '<td>'.h($item_row['country_of_origin']).'</td>';
+    echo '<td>'.h($quantity).'</td>';
+    echo '<td>'.h($item_row['selling_price']).'</td>';
+    echo '<td>'.h($total_price).'</td>';
     echo '</tr>';
-    $q="DELETE FROM items_in_purchase_cart WHERE item_id='{$item['item_id']}'";
-    mysqli_query($conn,$q);
+    db_execute($conn, "DELETE FROM items_in_purchase_cart WHERE item_id=? AND cart_id=?", "ii", [$item['item_id'], $cart_id]);
     $final_price+=$total_price;
-    $q="INSERT INTO purchase VALUES (NULL, '{$supplier_id}','{$item_row['item_code']}','{$invoice_group['purchase_id']}', '{$item_row['selling_price']}', '{$quantity}','{$user_id}')";
-    if (!mysqli_query($conn,$q))
-    {
-        echo("Error description: " . mysqli_error($conn));
-    }
-    $q="UPDATE item SET stock=stock+$quantity WHERE item_id='{$item['item_id']}'";
-    mysqli_query($conn,$q);
+    db_execute($conn, "INSERT INTO purchase (supplier_id, item_code, invoice_group, price_per_item, quantity, user_id) VALUES (?, ?, ?, ?, ?, ?)", "isssii", [$supplier_id, $item_row['item_code'], $invoice_group_id, $item_row['selling_price'], $quantity, $user_id]);
+    db_execute($conn, "UPDATE item SET stock=stock+? WHERE item_id=?", "ii", [$quantity, $item['item_id']]);
 }
 echo ' </tbody>
 </table>';
-    $q="INSERT into purchase_invoice values(null,'{$invoice_group['purchase_id']}', '{$sell_date}',$amount_paid)";
-    mysqli_query($conn,$q);
+    db_execute($conn, "INSERT into purchase_invoice values(NULL, ?, ?, ?)", "sss", [$invoice_group_id, $sell_date, $amount_paid]);
 $supplier_dept=($total_price-$amount_paid);
-$q="UPDATE supplier SET balance_usd=balance_usd+$supplier_dept WHERE supplier_id=$supplier_id";
-mysqli_query($conn,$q);
-$q="UPDATE balance SET balance_usd=balance_usd-{$amount_paid}";
-mysqli_query($conn,$q);
+db_execute($conn, "UPDATE supplier SET balance_usd=balance_usd+? WHERE supplier_id=?", "si", [$supplier_dept, $supplier_id]);
+db_execute($conn, "UPDATE balance SET balance_usd=balance_usd-?", "s", [$amount_paid]);
 $final_price;
 echo '<div class="bottom"> 
 <span> Overall Total: </span><span id="overall_total">  '.$final_price.' $</span><br>

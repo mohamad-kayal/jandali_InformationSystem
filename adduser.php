@@ -15,6 +15,7 @@ window.location.replace("index.php");
 <div class="accountcontainer">
   <h2>Add New Account</h2><br>
   <form method="post" action="<?PHP echo $_SERVER['PHP_SELF']?>">
+  <?php echo csrf_input(); ?>
   <span>Username </span><br><input class="accountinputs" type="text" name="username" required value=""><br>
   <span>New Password </span><br><input class="accountinputs" type="password" name="password" required value=""><br>
   <span>Confirm Password </span><br><input class="accountinputs" type="password" name="password1" required value=""><br>
@@ -32,12 +33,17 @@ window.location.replace("index.php");
 
 <?php
 if(isset($_POST['save'])){
-  $username=$_POST['username'];
-  $password=$_POST['password'];
-  $password1=$_POST['password1'];
-  $address=$_POST['address'];
-  $phone__number=$_POST['phonenumber'];
-  $role_id=$_POST['typeofuser'];
+  if(!verify_csrf($_POST)){
+    echo 'Invalid request';
+    end_page_side_bar();
+    exit;
+  }
+  $username=request_value($_POST, 'username');
+  $password=request_value($_POST, 'password');
+  $password1=request_value($_POST, 'password1');
+  $address=request_value($_POST, 'address');
+  $phone__number=request_value($_POST, 'phonenumber');
+  $role_id=request_int($_POST, 'typeofuser');
   if($password==""){
     echo 'Please Enter A password for the new user';
   }
@@ -45,14 +51,15 @@ if(isset($_POST['save'])){
     echo 'The passwords should be identical';
 
   }
+  elseif(db_fetch_assoc($conn, "SELECT user_id FROM user WHERE username=?", "s", [$username])){
+    echo 'Username already exists';
+  }
   else {
-    $q="INSERT INTO user VALUES (NULL,'{$username}','{$password}','{$address}','{$phone__number}','{$role_id}')";
-    mysqli_query($conn,$q);
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    db_execute($conn, "INSERT INTO user VALUES (NULL,?,?,?,?,?)", "ssssi", [$username, $password_hash, $address, $phone__number, $role_id]);
     $last_id = $conn->insert_id;
-    $q="INSERT INTO purchase_cart VALUES (NULL , {$last_id})";
-    mysqli_query($conn,$q);
-    $q="INSERT INTO sell_cart VALUES (NULL, {$last_id})";
-    mysqli_query($conn,$q);
+    db_execute($conn, "INSERT INTO purchase_cart VALUES (NULL, ?)", "i", [$last_id]);
+    db_execute($conn, "INSERT INTO sell_cart VALUES (NULL, ?)", "i", [$last_id]);
     echo 'New User Added Successfully';
   }
 }

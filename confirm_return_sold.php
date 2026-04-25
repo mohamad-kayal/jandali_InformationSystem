@@ -1,14 +1,15 @@
 <?php
-require_once 'connection.php';
-$image_path=$_POST['image'];
+require_once 'helpers.php';
+require_post_with_csrf();
+$image_path=request_value($_POST, 'image');
 $sell_date = date('Y/m/d h:i:s', time());
 $date = date('d/m/Y', time());
-$invoice_group=$_POST['invoice_group'];
-$q="SELECT invoice_id FROM sell_invoice order by invoice_id DESC limit 1";
-$invoice_group_for_number=mysqli_fetch_assoc(mysqli_query($conn,$q));
+$invoice_group=request_value($_POST, 'invoice_group');
+$invoice_group_for_number=db_fetch_assoc($conn, "SELECT invoice_id FROM sell_invoice order by invoice_id DESC limit 1");
 $final_price=0;
-$q="SELECT * from sell where invoice_group='{$invoice_group}'";
-$sell_result=mysqli_query($conn,$q);
+$returned_client_id=0;
+$sell_stmt=db_execute($conn, "SELECT * from sell where invoice_group=?", "s", [$invoice_group]);
+$sell_result=$sell_stmt ? mysqli_stmt_get_result($sell_stmt) : false;
 $i=0;
 echo '<!DOCTYPE html>
         <html lang="en">
@@ -26,7 +27,7 @@ echo '<!DOCTYPE html>
 </head>
 <body>
   <nav>';
-  echo '<img src="'.$image_path.'" id="company_logo" style="width: 27em; height: 16em;" alt="Company Logo" class="icon">';
+  echo '<img src="'.h($image_path).'" id="company_logo" style="width: 27em; height: 16em;" alt="Company Logo" class="icon">';
    echo' <div class="companyinfo">
         <span>Address: </span><span
         id="company_address">LEBANON-TRIPOLI<br>Boulivar Street<br>Front of Galatasaray vs Goovernment<br>
@@ -55,32 +56,31 @@ echo '<table id="tablePreview" class="table table-striped">
 <tbody>';
 // table goes here 
 while ($row=mysqli_fetch_assoc($sell_result)) {
-if($_POST['quantity_returned'][$i]!=0){
- $item_code=$_POST['item_code'][$i];
- $q="SELECT * from item where item_code=$item_code";
- $item=mysqli_fetch_assoc(mysqli_query($conn,$q));
- $total_price=$item['selling_price']*$_POST['quantity_returned'][$i];
- $quantity_returned=$_POST['quantity_returned'][$i];
- $sell_id=$_POST['sell_id'][$i];
- $client_id=$_POST['client_id'][$i];
+ if((int) $_POST['quantity_returned'][$i]!=0){
+  $item_code=(string) ($_POST['item_code'][$i] ?? '');
+  $item=db_fetch_assoc($conn, "SELECT * from item where item_code=?", "s", [$item_code]);
+  $quantity_returned=(int) $_POST['quantity_returned'][$i];
+  $total_price=$item['selling_price']*$quantity_returned;
+  $sell_id=(int) $_POST['sell_id'][$i];
+  $client_id=(int) $_POST['client_id'][$i];
+  $returned_client_id=$client_id;
  echo '<tr>';
- echo '<td>'.$item['item_code'].'</td>';
- echo '<td>'.$item['brand'].'</td>';
- echo '<td>'.$item['country_of_origin'].'</td>';
- echo '<td>'.$quantity_returned.'</td>';
- echo '<td>'.$item['selling_price'].'</td>';
- echo '<td>'.$total_price.'</td>';
+  echo '<td>'.h($item['item_code']).'</td>';
+  echo '<td>'.h($item['brand']).'</td>';
+  echo '<td>'.h($item['country_of_origin']).'</td>';
+  echo '<td>'.h($quantity_returned).'</td>';
+  echo '<td>'.h($item['selling_price']).'</td>';
+  echo '<td>'.h($total_price).'</td>';
  $final_price+=$total_price;
  echo '</tr>';
 
-    $q="UPDATE sell set quantity=quantity-'{$quantity_returned}' WHERE sell_id='{$sell_id}'";
-    mysqli_query($conn,$q);
-    $q="UPDATE client set balance_usd=balance_usd-'{$final_price}' where client_id='{$client_id}'";
-    mysqli_query($conn,$q);
-    $q="UPDATE item set stock=stock+'{$quantity_returned}' where item_code=$item_code";
-    mysqli_query($conn,$q);
+    db_execute($conn, "UPDATE sell SET quantity=quantity-? WHERE sell_id=?", "ii", [$quantity_returned, $sell_id]);
+    db_execute($conn, "UPDATE item SET stock=stock+? WHERE item_code=?", "is", [$quantity_returned, $item_code]);
 }
     $i++;
+}
+if ($final_price > 0 && $returned_client_id > 0) {
+    db_execute($conn, "UPDATE client SET balance_usd=balance_usd-? WHERE client_id=?", "si", [$final_price, $returned_client_id]);
 }
 
 echo '

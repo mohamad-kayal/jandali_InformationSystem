@@ -1,12 +1,16 @@
 <?php
-require_once 'connection.php';
-$q="SELECT * FROM sell_invoice WHERE invoice_id='{$_GET['id']}'";
-$result=mysqli_fetch_assoc(mysqli_query($conn,$q));
+require_once 'helpers.php';
+$invoice_id = request_int($_GET, 'id');
+$result = db_fetch_assoc($conn, "SELECT * FROM sell_invoice WHERE invoice_id=?", "i", [$invoice_id]);
+if (!$result) {
+    die('Invoice not found');
+}
 ?>
-<form method="post" action="view_items_from_invoice_sell.php";>
-<input type="text" hidden value=<?php echo $_GET['id']?> name="invoice_id">
-<input type="text" hidden value=<?php echo $result['invoice_group']?> name="invoice_group">
-<input type="text" hidden value=<?php echo $result['invoice_date_of_sale']?> name="invoice_date_of_sale">
-<input type="text" hidden value=<?php echo $result['amount_paid']?> name="amount_paid">
+<form method="post" action="view_items_from_invoice_sell.php">
+<?php echo csrf_input(); ?>
+<input type="text" hidden value="<?php echo h($invoice_id)?>" name="invoice_id">
+<input type="text" hidden value="<?php echo h($result['invoice_group'])?>" name="invoice_group">
+<input type="text" hidden value="<?php echo h($result['invoice_date_of_sale'])?>" name="invoice_date_of_sale">
+<input type="text" hidden value="<?php echo h($result['amount_paid'])?>" name="amount_paid">
 <input type="submit"  value="confirm Return" name="invoice_confirm">
 </form>

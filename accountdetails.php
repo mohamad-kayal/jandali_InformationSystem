@@ -1,9 +1,7 @@
 <?php
-include('connection.php');
+require_once('helpers.php');
 include('html_templates.php');
 start_page_side_bar();
-$q="SELECT * FROM user WHERE user_id='{$_SESSION['user_id']}'";
-$user_details=mysqli_fetch_assoc(mysqli_query($conn,$q));
 if(!isset($_SESSION['user_id'])){
 
   ?>
@@ -13,19 +11,23 @@ window.location.replace("index.php");
 
 <?php
 }
+$user_id = (int) $_SESSION['user_id'];
+$user_details = db_fetch_assoc($conn, "SELECT * FROM user WHERE user_id=?", "i", [$user_id]);
 ?>
 
 <div class="accountcontainer">
   <h2>Account Details</h2><br>
   <form method="post" action="<?php echo $_SERVER['PHP_SELF']  ?> ">
-  <span>Username </span><br><input class="accountinputs" type="text" name="username" value="<?php echo $user_details['username']  ?> "><br>
+  <?php echo csrf_input(); ?>
+  <span>Username </span><br><input class="accountinputs" type="text" name="username" value="<?php echo h($user_details['username'])  ?> "><br>
   <span>New Password </span><br><input class="accountinputs" type="password" name="password" value=""><br>
   <span>Confirm Password </span><br><input class="accountinputs" type="password" name="password2" value=""><br>
-  <span>Address </span><br> <input  class="accountinputs" type="text" name="address" value="<?php echo $user_details['address']  ?> "><br>
-  <span>Phone Number </span><br><input class="accountinputs" type="text" name="phonenumber" value="<?php echo $user_details['phone__number']  ?> "><br>
+  <span>Address </span><br> <input  class="accountinputs" type="text" name="address" value="<?php echo h($user_details['address'])  ?> "><br>
+  <span>Phone Number </span><br><input class="accountinputs" type="text" name="phonenumber" value="<?php echo h($user_details['phone_number'] ?? '')  ?> "><br>
   <input type="submit" class="savebutton" name="save" value="Save"><br>
   </form>
   <form action="<?php echo $_SERVER['PHP_SELF']  ?> " method="post" enctype="multipart/form-data">
+    <?php echo csrf_input(); ?>
     Select Logo to upload:
     <input type="file" name="fileToUpload" style="width: 100%;" class="accountinputs" required id="fileToUpload">
     <input type="text" name="logo_name" id="logo_name" class="accountinputs" required placeholder="LOGO Name">
@@ -38,14 +40,18 @@ window.location.replace("index.php");
 
 <?php
 if(isset($_POST['save'])){
-$username=$_POST['username'];
-$password=$_POST['password'];
-$password2=$_POST['password2'];
-$address=$_POST['address'];
-$phone__number=$_POST['phonenumber'];
+if(!verify_csrf($_POST)){
+  echo 'Invalid request';
+  end_page_side_bar();
+  exit;
+}
+$username=request_value($_POST, 'username');
+$password=request_value($_POST, 'password');
+$password2=request_value($_POST, 'password2');
+$address=request_value($_POST, 'address');
+$phone_number=request_value($_POST, 'phonenumber');
 if($password==""){
-  $q="UPDATE user SET username='{$username}', address='{$address}', phone__number='{$phone__number}'";
-  mysqli_query($conn,$q); 
+  db_execute($conn, "UPDATE user SET username=?, address=?, phone_number=? WHERE user_id=?", "sssi", [$username, $address, $phone_number, $user_id]);
 ?>
 
 <script> 
@@ -58,8 +64,8 @@ else {
     echo 'Invalid input, passwords are not identical !';
   }
   else{
-    $q="UPDATE user SET username='{$username}', password='{$password}', address='{$address}' , phone__number='{$phone__number}'";
-    mysqli_query($conn,$q); 
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    db_execute($conn, "UPDATE user SET username=?, password=?, address=?, phone_number=? WHERE user_id=?", "ssssi", [$username, $password_hash, $address, $phone_number, $user_id]);
 
   ?>
   
@@ -76,10 +82,19 @@ location.replace("logout.php");
 
 
 if(isset($_POST["submit_image"])){
-  $logo_name=$_POST['logo_name'];
+  if(!verify_csrf($_POST)){
+    echo 'Invalid request';
+    end_page_side_bar();
+    exit;
+  }
+  $logo_name=request_value($_POST, 'logo_name');
   $final_dir="";
   $target_dir = "images/logos/";
-  $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+  if (!is_dir($target_dir)) {
+      mkdir($target_dir, 0755, true);
+  }
+  $safe_name = preg_replace('/[^A-Za-z0-9._-]/', '_', basename($_FILES["fileToUpload"]["name"]));
+  $target_file = $target_dir . $safe_name;
   $uploadOk = 1;
   $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
   // Check if image file is a actual image or fake image
@@ -114,14 +129,15 @@ if(isset($_POST["submit_image"])){
   // if everything is ok, try to upload file
   } else {
       if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-          echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
-          $final_dir="images/logos/" .basename( $_FILES["fileToUpload"]["name"]);
+          echo "The file ". h($safe_name). " has been uploaded.";
+          $final_dir="images/logos/" .$safe_name;
       } else {
           echo "Sorry, there was an error uploading your file.";
       }
   }
-  $q="INSERT INTO logo VALUES (null,'{$logo_name}','{$final_dir}')";
-  mysqli_query($conn,$q);
+  if ($final_dir !== '') {
+    db_execute($conn, "INSERT INTO logo VALUES (NULL, ?, ?)", "ss", [$logo_name, $final_dir]);
+  }
   }
   
 end_page_side_bar();
