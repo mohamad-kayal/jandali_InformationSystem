@@ -49,9 +49,9 @@ $username=request_value($_POST, 'username');
 $password=request_value($_POST, 'password');
 $password2=request_value($_POST, 'password2');
 $address=request_value($_POST, 'address');
-$phone__number=request_value($_POST, 'phonenumber');
+$phone_number=request_value($_POST, 'phonenumber');
 if($password==""){
-  db_execute($conn, "UPDATE user SET username=?, address=?, phone_number=? WHERE user_id=?", "sssi", [$username, $address, $phone__number, $user_id]);
+  db_execute($conn, "UPDATE user SET username=?, address=?, phone_number=? WHERE user_id=?", "sssi", [$username, $address, $phone_number, $user_id]);
 ?>
 
 <script> 
@@ -65,7 +65,7 @@ else {
   }
   else{
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
-    db_execute($conn, "UPDATE user SET username=?, password=?, address=?, phone_number=? WHERE user_id=?", "ssssi", [$username, $password_hash, $address, $phone__number, $user_id]);
+    db_execute($conn, "UPDATE user SET username=?, password=?, address=?, phone_number=? WHERE user_id=?", "ssssi", [$username, $password_hash, $address, $phone_number, $user_id]);
 
   ?>
   

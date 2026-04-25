@@ -16,8 +16,8 @@ $cart_id = $cart ? (int) $cart['cart_id'] : 0;
 $items_stmt=db_execute($conn, "SELECT quantity as count, item_id FROM items_in_purchase_cart WHERE cart_id=?", "i", [$cart_id]);
 $items_in_cart=$items_stmt ? mysqli_stmt_get_result($items_stmt) : false;
 $image_path=request_value($_POST, 'image');
-$invoice_group=db_fetch_assoc($conn, "SELECT purchase_id FROM purchase order by purchase_id DESC limit 1");
-$invoice_group_id = $invoice_group ? $invoice_group['purchase_id'] : 1;
+$invoice_group=db_fetch_assoc($conn, "SELECT COALESCE(MAX(purchase_id), ?) + ? AS next_invoice_group FROM purchase", "ii", [0, 1]);
+$invoice_group_id = (int) $invoice_group['next_invoice_group'];
 echo '<!DOCTYPE html>
         <html lang="en">
         <head>

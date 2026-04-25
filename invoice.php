@@ -16,8 +16,8 @@ $cart_id = $cart ? (int) $cart['cart_id'] : 0;
 $items_stmt = db_execute($conn, "SELECT * FROM items_in_sell_cart WHERE cart_id=?", "i", [$cart_id]);
 $items_in_cart=$items_stmt ? mysqli_stmt_get_result($items_stmt) : false;
 //getting a invoice group by inserting a fake sell
-$invoice_group=db_fetch_assoc($conn, "SELECT sell_id FROM sell order by sell_id DESC limit 1");
-$invoice_group_id = $invoice_group ? $invoice_group['sell_id'] : 1;
+$invoice_group=db_fetch_assoc($conn, "SELECT COALESCE(MAX(sell_id), ?) + ? AS next_invoice_group FROM sell", "ii", [0, 1]);
+$invoice_group_id = (int) $invoice_group['next_invoice_group'];
 echo '<!DOCTYPE html>
         <html lang="en">
         <head>
