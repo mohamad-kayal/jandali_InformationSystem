@@ -1,7 +1,8 @@
 <?php
 session_start();
 require_once("helpers.php");
-$id=request_int($_GET, "id");
+require_post_with_csrf();
+$id=request_int($_POST, "id");
 if ($id > 0 && db_execute($conn, "DELETE FROM client WHERE client_id=?", "i", [$id])){
 	echo "success";
 }

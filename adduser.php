@@ -15,6 +15,7 @@ window.location.replace("index.php");
 <div class="accountcontainer">
   <h2>Add New Account</h2><br>
   <form method="post" action="<?PHP echo $_SERVER['PHP_SELF']?>">
+  <?php echo csrf_input(); ?>
   <span>Username </span><br><input class="accountinputs" type="text" name="username" required value=""><br>
   <span>New Password </span><br><input class="accountinputs" type="password" name="password" required value=""><br>
   <span>Confirm Password </span><br><input class="accountinputs" type="password" name="password1" required value=""><br>
@@ -32,6 +33,11 @@ window.location.replace("index.php");
 
 <?php
 if(isset($_POST['save'])){
+  if(!verify_csrf($_POST)){
+    echo 'Invalid request';
+    end_page_side_bar();
+    exit;
+  }
   $username=request_value($_POST, 'username');
   $password=request_value($_POST, 'password');
   $password1=request_value($_POST, 'password1');

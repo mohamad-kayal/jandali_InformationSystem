@@ -1,11 +1,12 @@
 <?php 
 require_once("helpers.php");
-$id = request_int($_GET, 'id'); 
-$title = request_value($_GET, 'title'); 
-$location = request_value($_GET, 'location'); 
-$phone = request_value($_GET, 'phone'); 
-$email = request_value($_GET, 'email'); 
-$balance_usd = request_value($_GET, 'balance_usd'); 
+require_post_with_csrf();
+$id = request_int($_POST, 'id'); 
+$title = request_value($_POST, 'title'); 
+$location = request_value($_POST, 'location'); 
+$phone = request_value($_POST, 'phone'); 
+$email = request_value($_POST, 'email'); 
+$balance_usd = request_value($_POST, 'balance_usd'); 
 
 db_execute($conn, "UPDATE supplier SET title=?, location=?, phone_number=?, email=?, balance_usd=? WHERE supplier_id=?", "sssssi", [$title, $location, $phone, $email, $balance_usd, $id]);
 

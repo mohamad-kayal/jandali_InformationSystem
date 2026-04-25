@@ -1,10 +1,11 @@
 <?php 
 require_once('helpers.php');
-$title=request_value($_GET, 'title');
-$location=request_value($_GET, 'location');
-$phone=request_value($_GET, 'phone');
-$email=request_value($_GET, 'email');
-$balance=request_value($_GET, 'balance');
+require_post_with_csrf();
+$title=request_value($_POST, 'title');
+$location=request_value($_POST, 'location');
+$phone=request_value($_POST, 'phone');
+$email=request_value($_POST, 'email');
+$balance=request_value($_POST, 'balance');
 db_execute($conn, "INSERT INTO supplier VALUES (NULL,?,?,?,?,?)", "sssss", [$title, $location, $phone, $email, $balance]);
 $last_id = $conn->insert_id;
 echo "<tr id=\"".h($last_id)."\">";

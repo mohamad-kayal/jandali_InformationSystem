@@ -1,5 +1,5 @@
 <?php 
-include('connection.php');
+require_once('helpers.php');
 include('html_templates.php');
 start_page_side_bar();
 
@@ -23,6 +23,7 @@ echo '<div class="container">
   <p>Client Payment: </p>
   <div id="balance_lbp">
   <form  action=# method=post>
+  '.csrf_input().'
   <span>Select Client</span>
   <select class="userselection" style="width:10em;" name="selection_client" required id="client_select" onchange="get_dept_client()">
   <option value="" selected disabled hidden>Choose Client</option>';
@@ -43,7 +44,8 @@ echo '<div class="container">
   <div class="balanceusd">
   <p>Supplier Payment </p>
   <div id="balance_usd">
-  <form action=# method=post>
+   <form action=# method=post>
+   '.csrf_input().'
   <span>Select Supplier</span>
   <select class="userselection"  style="width:10em;"  name="selection_supplier" required id="supplier_select" onchange="get_dept_supplier()">
   <option value="" selected disabled hidden>Choose Supplier</option>';
@@ -68,17 +70,23 @@ echo '<div class="container">
 
 
 if(isset($_POST['confirm_payment_supplier'])){
-  $supplier_id=$_POST['selection_supplier'];
-  $amount_paid=$_POST['amount_paid_supplier'];
-  $q="UPDATE supplier SET balance_usd=balance_usd-{$amount_paid} WHERE supplier_id={$supplier_id}";
-  mysqli_query($conn,$q);
+  if(!verify_csrf($_POST)){
+    echo 'Invalid request';
+  } else {
+    $supplier_id=request_int($_POST, 'selection_supplier');
+    $amount_paid=request_value($_POST, 'amount_paid_supplier');
+    db_execute($conn, "UPDATE supplier SET balance_usd=balance_usd-? WHERE supplier_id=?", "si", [$amount_paid, $supplier_id]);
+  }
 }
 
 if(isset($_POST['confirm_payment_clinet'])){
-  $client_id=$_POST['selection_client'];
-  $amount_paid=$_POST['amount_paid_client'];
-  $q="UPDATE client SET balance_usd=balance_usd-{$amount_paid} WHERE client_id={$client_id}";
-  mysqli_query($conn,$q);
+  if(!verify_csrf($_POST)){
+    echo 'Invalid request';
+  } else {
+    $client_id=request_int($_POST, 'selection_client');
+    $amount_paid=request_value($_POST, 'amount_paid_client');
+    db_execute($conn, "UPDATE client SET balance_usd=balance_usd-? WHERE client_id=?", "si", [$amount_paid, $client_id]);
+  }
 }
 ?>
 <script>

@@ -299,7 +299,11 @@ function return_sold_items(){
 function check_login(){
 	if(isset($_POST['login'])){
 		GLOBAL $conn;
-		session_start();
+		if (!verify_csrf($_POST)) {
+			echo "<span>invalid request</span>";
+			return;
+		}
+		ensure_session_started();
 $username= request_value($_POST, 'username'); 
 $password= request_value($_POST, 'password'); 
 		$stmt = db_execute($conn, "SELECT * FROM user WHERE username=?", "s", [$username]);

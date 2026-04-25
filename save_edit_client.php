@@ -1,12 +1,13 @@
 <?php 
 require_once("helpers.php");
-$id = request_int($_GET, 'id'); 
-$name = request_value($_GET, 'name'); 
-$phone_number = request_value($_GET, 'phone_number'); 
-$address = request_value($_GET, 'address'); 
-$mof = request_value($_GET, 'mof'); 
-$discount = request_value($_GET, 'discount'); 
-$balance_usd = request_value($_GET, 'balance_usd'); 
+require_post_with_csrf();
+$id = request_int($_POST, 'id'); 
+$name = request_value($_POST, 'name'); 
+$phone_number = request_value($_POST, 'phone_number'); 
+$address = request_value($_POST, 'address'); 
+$mof = request_value($_POST, 'mof'); 
+$discount = request_value($_POST, 'discount'); 
+$balance_usd = request_value($_POST, 'balance_usd'); 
 db_execute(
     $conn,
     "UPDATE client SET `name`=?, phone_number=?, address=?, MOF=?, discount=?, balance_usd=? WHERE client_id=?",

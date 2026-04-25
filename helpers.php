@@ -18,6 +18,44 @@ function request_int($source, $key, $default = 0)
 	]);
 }
 
+function ensure_session_started()
+{
+	if (session_status() !== PHP_SESSION_ACTIVE) {
+		session_start();
+	}
+}
+
+function csrf_token()
+{
+	ensure_session_started();
+	if (empty($_SESSION['csrf_token'])) {
+		$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+	}
+	return $_SESSION['csrf_token'];
+}
+
+function csrf_input()
+{
+	return '<input type="hidden" name="csrf_token" value="' . h(csrf_token()) . '">';
+}
+
+function verify_csrf($source = null)
+{
+	ensure_session_started();
+	$source = $source === null ? $_POST : $source;
+	return isset($source['csrf_token'], $_SESSION['csrf_token'])
+		&& hash_equals($_SESSION['csrf_token'], (string) $source['csrf_token']);
+}
+
+function require_post_with_csrf()
+{
+	if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verify_csrf($_POST)) {
+		http_response_code(403);
+		echo 'Invalid request';
+		exit;
+	}
+}
+
 /**
  * Prepare and execute a SQL statement with optional bound parameters.
  * Returns the statement handle on success or false on failure.

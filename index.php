@@ -20,6 +20,7 @@ check_login();
         <h1>Login to Continue</h1>
         <h2>Welcome Back! Login to access your account.</h2>
         <form method="post" action="index.php">
+        <?php echo csrf_input(); ?>
             
         <input class="username" type="text" placeholder="Username" name="username">
         <input class="password" type="password" placeholder="Password" name="password">

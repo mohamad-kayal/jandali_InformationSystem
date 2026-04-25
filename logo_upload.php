@@ -2,6 +2,7 @@
 <html>
 <body>
 <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post" enctype="multipart/form-data">
+    <?php require_once('helpers.php'); echo csrf_input(); ?>
     Select image to upload:
     <input type="file" name="fileToUpload" id="fileToUpload">
     <input type="submit" value="Upload Image" name="submit_image">
@@ -9,11 +10,19 @@
 </body>
 </html>
 <?php
-include('connection.php');  
+require_once('helpers.php');  
 if(isset($_POST["submit_image"])){
+if(!verify_csrf($_POST)){
+    echo 'Invalid request';
+    exit;
+}
 $final_dir="";
 $target_dir = "images/logos/";
-$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+if (!is_dir($target_dir)) {
+    mkdir($target_dir, 0755, true);
+}
+$safe_name = preg_replace('/[^A-Za-z0-9._-]/', '_', basename($_FILES["fileToUpload"]["name"]));
+$target_file = $target_dir . $safe_name;
 $uploadOk = 1;
 $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 // Check if image file is a actual image or fake image
@@ -48,14 +57,15 @@ if ($uploadOk == 0) {
 // if everything is ok, try to upload file
 } else {
     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-        echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
-        $final_dir="images/" .basename( $_FILES["fileToUpload"]["name"]);
+        echo "The file ". h($safe_name). " has been uploaded.";
+        $final_dir="images/logos/" .$safe_name;
     } else {
         echo "Sorry, there was an error uploading your file.";
     }
 }
-$q="INSERT INTO logo VALUES (null,'someimg','{$final_dir}')";
-mysqli_query($conn,$q);
+if ($final_dir !== '') {
+    db_execute($conn, "INSERT INTO logo VALUES (NULL, ?, ?)", "ss", ['someimg', $final_dir]);
+}
 }
 
 ?>

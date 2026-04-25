@@ -1,10 +1,10 @@
 <?php 
-session_start();
 require_once("helpers.php");
+require_post_with_csrf();
 
-$id = request_int($_GET, 'id');
-$type_of_cart = request_value($_GET, 'type_of_cart');
-$quantity = request_int($_GET, 'quantity', 1);
+$id = request_int($_POST, 'id');
+$type_of_cart = request_value($_POST, 'type_of_cart');
+$quantity = request_int($_POST, 'quantity', 1);
 $user_id = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 0;
 
 if ($id <= 0 || $quantity <= 0 || $user_id <= 0) {

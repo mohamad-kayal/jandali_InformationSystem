@@ -1,15 +1,17 @@
 <?php
-require_once 'connection.php';
+require_once 'helpers.php';
 require_once 'html_templates.php';
-$invoice_id=$_POST['invoice_id'];
-$invoice_group=$_POST['invoice_group'];
-$invoice_date_of_sale=$_POST['invoice_date_of_sale'];
-$amount_paid=$_POST['amount_paid'];
-$q="SELECT * from purchase where invoice_group='{$invoice_group}'";
-$purchse_result=mysqli_query($conn,$q);
+require_post_with_csrf();
+$invoice_id=request_int($_POST, 'invoice_id');
+$invoice_group=request_value($_POST, 'invoice_group');
+$invoice_date_of_sale=request_value($_POST, 'invoice_date_of_sale');
+$amount_paid=request_value($_POST, 'amount_paid');
+$purchase_stmt=db_execute($conn, "SELECT * from purchase where invoice_group=?", "s", [$invoice_group]);
+$purchse_result=$purchase_stmt ? mysqli_stmt_get_result($purchase_stmt) : false;
 start_page_side_bar();
 ?>
 <form method="post" action="confirm_return_bought.php">
+<?php echo csrf_input(); ?>
 <table id="data" class="compact table table-striped"  style="width:100%;">
 <thead>
     <tr>

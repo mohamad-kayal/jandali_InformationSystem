@@ -37,8 +37,15 @@ function start_page_side_bar(){
      // }
     // else{
        // window.location.href="suppliers.php";
-        // console.log(window.location.href);
-        // }
+         // console.log(window.location.href);
+         // }
+      var CSRF_TOKEN = '<?php echo h(csrf_token()); ?>';
+      function postAjax(xhttp, url, params) {
+        xhttp.open("POST", url, true);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        var payload = params ? params + "&" : "";
+        xhttp.send(payload + "csrf_token=" + encodeURIComponent(CSRF_TOKEN));
+      }
 
   </script>
 </head>
@@ -199,9 +206,9 @@ function add_item(){
             document.getElementById("add_description").value =" ";
             document.getElementById("add_country_of_origin").value =" ";
             document.getElementById("add_ministry_code").value =" ";
-            xhttp.open("GET","add_item.php?name="+name+"&itemcode="+itemcode+"&stock="+stock+"&buying_price="+buying_price+"&selling_price="+selling_price+
-            "&size="+size+"&diameter="+diameter+"&brand="+brand+"&material="+material+"&description="+description
-            +"&country_of_origin="+country_of_origin+"&ministry_code="+ministry_code, true);
+            var params = new URLSearchParams({name:name, itemcode:itemcode, stock:stock, buying_price:buying_price, selling_price:selling_price,
+            size:size, diameter:diameter, brand:brand, material:material, description:description,
+            country_of_origin:country_of_origin, ministry_code:ministry_code}).toString();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     console.log(this.responseText);
@@ -209,7 +216,7 @@ function add_item(){
                 fill_table();
                 }
             };
-            xhttp.send();
+            postAjax(xhttp, "add_item.php", params);
             return false;
     }
     }
@@ -220,7 +227,7 @@ function delete_items(id){
     if (r == true) {
         var row=document.getElementById(id);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "delete_items.php?id="+id, true);
+        var params = new URLSearchParams({id:id}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                     row.style.display= "none";
@@ -228,7 +235,7 @@ function delete_items(id){
                     update_sell_cart_span();
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "delete_items.php", params);
 } 
     }
 
@@ -281,20 +288,16 @@ function get_edit_row_items(id){
         var ministry_code =document.getElementById(id+"_ministry_code").value;
         var row=document.getElementById(id);
         var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "save_edit_item.php?id="+
-            id+"&item_code="+itemcode+"&name="+name+"&buying_price="+
-            buying_price+"&selling_price="+selling_price+
-            "&size="+size+"&diameter="+diameter+"&brand="+brand+
-            "&material="+material+"&description="+description+"&country_of_origin="+
-            country_of_origin+"&ministry_code="+
-            ministry_code+"&row="+row, true);
+            var params = new URLSearchParams({id:id, item_code:itemcode, name:name, buying_price:buying_price,
+            selling_price:selling_price, size:size, diameter:diameter, brand:brand, material:material,
+            description:description, country_of_origin:country_of_origin, ministry_code:ministry_code}).toString();
             xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 row.innerHTML=this.responseText;
                 console.log(this.responseText);
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "save_edit_item.php", params);
     }
 
 function fill_table() {
@@ -361,7 +364,7 @@ echo '</form>';
         document.getElementById("add_mof").value=" ";
         document.getElementById("add_balance").value=" ";
         document.getElementById("add_discount").value=" ";
-        xhttp.open("GET", "add_client.php?name="+name+"&phonenumber="+phonenumber+"&address="+address+"&mof="+mof+"&balance="+balance+"&discount="+discount, true);
+        var params = new URLSearchParams({name:name, phonenumber:phonenumber, address:address, mof:mof, balance:balance, discount:discount}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 console.log(this.responseText);
@@ -369,7 +372,7 @@ echo '</form>';
             fill_table();
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "add_client.php", params);
     }
 
 function delete_clients(id){
@@ -379,7 +382,7 @@ var r = confirm("Are you sure that you want to delete this record with all the r
            if (r == true) {
         var row=document.getElementById(id);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "delete_clients.php?id="+id, true);
+        var params = new URLSearchParams({id:id}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 if (this.responseText=="success"){
@@ -387,7 +390,7 @@ var r = confirm("Are you sure that you want to delete this record with all the r
                 }
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "delete_clients.php", params);
         } 
     }
 
@@ -413,14 +416,14 @@ var r = confirm("Are you sure that you want to delete this record with all the r
         var discount =document.getElementById(id+"_discount").value;
         var row=document.getElementById(id);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "save_edit_client.php?name="+name+"&id="+id+"&phone_number="+phone_number+"&discount="+discount+"&address="+address+"&mof="+mof+"&balance_usd="+balance_usd+"&row="+row, true);
+        var params = new URLSearchParams({name:name, id:id, phone_number:phone_number, discount:discount, address:address, mof:mof, balance_usd:balance_usd}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 row.innerHTML=this.responseText;
                 
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "save_edit_client.php", params);
     }
 
 function fill_table() {
@@ -480,7 +483,7 @@ echo '</form>';
         document.getElementById("add_phonenumber").value=" ";
         document.getElementById("add_email").value=" ";
         document.getElementById("add_balance").value=" ";
-        xhttp.open("GET", "add_supplier.php?title="+title+"&location="+location+"&phone="+phone+"&email="+email+"&balance="+balance, true);
+        var params = new URLSearchParams({title:title, location:location, phone:phone, email:email, balance:balance}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 console.log(this.responseText);
@@ -488,7 +491,7 @@ echo '</form>';
             fill_table();
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "add_supplier.php", params);
     }
 
     function delete_suppliers(id){
@@ -497,7 +500,7 @@ echo '</form>';
 var r = confirm("Are you sure that you want to delete this record with all the related fields!");
 if (r == true) {
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "delete_suppliers.php?id="+id, true);
+        var params = new URLSearchParams({id:id}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 if (this.responseText=="success"){
@@ -505,7 +508,7 @@ if (r == true) {
                 }
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "delete_suppliers.php", params);
         } 
     }
 
@@ -529,13 +532,13 @@ if (r == true) {
         var balance_usd =document.getElementById(id+"_balance_usd").value;
         var row=document.getElementById(id);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "save_edit_supplier.php?title="+title+"&id="+id+"&location="+location+"&phone="+phone+"&email="+email+"&balance_usd="+balance_usd+"&row="+row, true);
+        var params = new URLSearchParams({title:title, id:id, location:location, phone:phone, email:email, balance_usd:balance_usd}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 row.innerHTML=this.responseText;
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "save_edit_supplier.php", params);
     }
 
     function fill_table() {
@@ -585,7 +588,7 @@ else{
 
     var quantity =document.getElementById(id+"_quantity").value;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "add_to_purchase_cart.php?item_id="+id+"&quantity="+quantity, true);
+        var params = new URLSearchParams({item_id:id, quantity:quantity}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
            console.log(this.responseText);
@@ -594,7 +597,7 @@ else{
                 alert("Items added to cart successfully");
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "add_to_purchase_cart.php", params);
 
 }
 
@@ -609,7 +612,7 @@ else{
 
     var quantity =document.getElementById(id+"_quantity").value;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "add_to_sell_cart.php?item_id="+id+"&quantity="+quantity, true);
+        var params = new URLSearchParams({item_id:id, quantity:quantity}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 if(this.responseText=="error"){
@@ -624,7 +627,7 @@ else{
                 
                      }
         };
-        xhttp.send();
+        postAjax(xhttp, "add_to_sell_cart.php", params);
 
 }
 }
@@ -670,6 +673,7 @@ function view_sell_cart_html(){
     <?php 
     include('connection.php');
     echo '<form method="post" style="float:left;" action="invoice.php">';
+    echo csrf_input();
         echo '<span> SELECT Client : &nbsp </span> <select style="width:10em;" class="userselection" required name="client_id" >';
         echo ' <option value="" selected disabled hidden>Choose Client</option>';
         $q="SELECT * FROM client";
@@ -690,6 +694,7 @@ function view_sell_cart_html(){
     echo '<input type=submit name="submit" value="Confirm Purchase" class="addbutton">' ;
     echo '</form>';
     echo '<form method="post" style="float:right;" action="proforma_invoice.php">';
+    echo csrf_input();
     echo '<span> SELECT Client : &nbsp </span> <select style="width:10em;" class="userselection" required name="client_id" >';
     echo ' <option value="" selected disabled hidden>Choose Client</option>';
     $q="SELECT * FROM client";
@@ -742,20 +747,20 @@ function get_edit_row_items_from_cart_sell(id){
         var row=document.getElementById(id);
         quantity=document.getElementById(id+"_quantity").value;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "save_edit_row_from_cart.php?id="+id+"&type_of_cart=sell_cart&quantity="+quantity, true);
+        var params = new URLSearchParams({id:id, type_of_cart:"sell_cart", quantity:quantity}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
             row.innerHTML=this.responseText;
             // console.log(this.responseText);
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "save_edit_row_from_cart.php", params);
     }
     
 function delete_items_from_cart_sell(id){
         var row=document.getElementById(id);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "delete_sell_cart_item.php?id="+id, true);
+        var params = new URLSearchParams({id:id}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                     row.style.display= "none";
@@ -763,7 +768,7 @@ function delete_items_from_cart_sell(id){
                     update_sell_cart_span();
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "delete_sell_cart_item.php", params);
 
     }
 
@@ -797,6 +802,7 @@ window.location.replace("index.php");
 
 include('connection.php');
 echo '<form method="post" style="float:left;" action="confirm_purchase.php">';
+echo csrf_input();
     echo '<span> SELECT Supplier : &nbsp </span> <select style="width:10em;" class="userselection"  required name="supplier_id" >';
     echo ' <option value="" selected disabled hidden>Choose Supplier</option>';
     $q="SELECT * FROM supplier";
@@ -858,20 +864,20 @@ echo '</form>';
         var row=document.getElementById(id);
         quantity=document.getElementById(id+"_quantity").value;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "save_edit_row_from_cart.php?id="+id+"&type_of_cart=purchase_cart&quantity="+quantity, true);
+        var params = new URLSearchParams({id:id, type_of_cart:"purchase_cart", quantity:quantity}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
             // row.innerHTML=this.responseText;
             console.log(this.responseText);
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "save_edit_row_from_cart.php", params);
     }
             
     function delete_items_from_cart_purchase(id){
         var row=document.getElementById(id);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "delete_purchase_cart_items.php?id="+id, true);
+        var params = new URLSearchParams({id:id}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                     row.style.display= "none";
@@ -879,7 +885,7 @@ echo '</form>';
                     update_sell_cart_span();
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "delete_purchase_cart_items.php", params);
     }
     
 function fill_table() {

@@ -65,14 +65,13 @@ function get_edit_balance_lbp(){
         row=document.getElementById("balance_lbp");
         var balance=document.getElementById("new_balance_lbp");
         var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "save_edit_balance_lbp.php?balance_lbp="+
-            balance.value, true);
+            var params = new URLSearchParams({balance_lbp:balance.value}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 row.innerHTML=this.responseText;
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "save_edit_balance_lbp.php", params);
     }
 
 
@@ -96,14 +95,13 @@ function get_edit_balance_usd(){
         row=document.getElementById("balance_usd");
         var balance=document.getElementById("new_balance_usd");
         var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "save_edit_balance_usd.php?balance_usd="+
-            balance.value, true);
+            var params = new URLSearchParams({balance_usd:balance.value}).toString();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 row.innerHTML=this.responseText;
             }
         };
-        xhttp.send();
+        postAjax(xhttp, "save_edit_balance_usd.php", params);
     }
 
 

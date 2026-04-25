@@ -1,17 +1,18 @@
 <?php 
 require_once('helpers.php');
-$itemcode=request_value($_GET, 'itemcode');
-$name=request_value($_GET, 'name');
-$buying_price=request_value($_GET, 'buying_price');
-$selling_price=request_value($_GET, 'selling_price');
-$size=request_value($_GET, 'size');
-$diameter=request_value($_GET, 'diameter');
-$brand=request_value($_GET, 'brand');
-$material=request_value($_GET, 'material');
-$description=request_value($_GET, 'description');
-$country_of_origin=request_value($_GET, 'country_of_origin');
-$stock=request_value($_GET, 'stock');
-$ministry_code=request_value($_GET, 'ministry_code');
+require_post_with_csrf();
+$itemcode=request_value($_POST, 'itemcode');
+$name=request_value($_POST, 'name');
+$buying_price=request_value($_POST, 'buying_price');
+$selling_price=request_value($_POST, 'selling_price');
+$size=request_value($_POST, 'size');
+$diameter=request_value($_POST, 'diameter');
+$brand=request_value($_POST, 'brand');
+$material=request_value($_POST, 'material');
+$description=request_value($_POST, 'description');
+$country_of_origin=request_value($_POST, 'country_of_origin');
+$stock=request_value($_POST, 'stock');
+$ministry_code=request_value($_POST, 'ministry_code');
 $item_params = [$itemcode, $name, $buying_price, $selling_price, $size, $diameter, $brand, $material, $description, $country_of_origin, $stock, $ministry_code];
 db_execute(
     $conn,

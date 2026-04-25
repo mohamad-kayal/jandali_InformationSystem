@@ -1,11 +1,12 @@
 <?php 
 require_once('helpers.php');
-$name=request_value($_GET, 'name');
-$phonenumber=request_value($_GET, 'phonenumber');
-$address=request_value($_GET, 'address');
-$mof=request_value($_GET, 'mof');
-$balance=request_value($_GET, 'balance');
-$discount=request_value($_GET, 'discount');
+require_post_with_csrf();
+$name=request_value($_POST, 'name');
+$phonenumber=request_value($_POST, 'phonenumber');
+$address=request_value($_POST, 'address');
+$mof=request_value($_POST, 'mof');
+$balance=request_value($_POST, 'balance');
+$discount=request_value($_POST, 'discount');
 db_execute($conn, "INSERT INTO client VALUES (NULL,?,?,?,?,?,?)", "ssssss", [$balance, $name, $mof, $address, $phonenumber, $discount]);
 $last_id = $conn->insert_id;		
 echo "<tr id=\"".h($last_id)."\" >";
