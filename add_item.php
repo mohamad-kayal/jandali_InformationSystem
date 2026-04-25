@@ -12,11 +12,12 @@ $description=request_value($_GET, 'description');
 $country_of_origin=request_value($_GET, 'country_of_origin');
 $stock=request_value($_GET, 'stock');
 $ministry_code=request_value($_GET, 'ministry_code');
+$item_params = [$itemcode, $name, $buying_price, $selling_price, $size, $diameter, $brand, $material, $description, $country_of_origin, $stock, $ministry_code];
 db_execute(
     $conn,
     "INSERT INTO item VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?,?)",
-    "ssssssssssss",
-    [$itemcode, $name, $buying_price, $selling_price, $size, $diameter, $brand, $material, $description, $country_of_origin, $stock, $ministry_code]
+    str_repeat('s', count($item_params)),
+    $item_params
 );
 $last_id = $conn->insert_id;
 echo "<tr id=\"".h($last_id)."\">";

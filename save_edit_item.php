@@ -12,11 +12,12 @@ $material=request_value($_GET, 'material');
 $description=request_value($_GET, 'description');
 $country_of_origin=request_value($_GET, 'country_of_origin');
 $ministry_code=request_value($_GET, 'ministry_code');
+$item_params = [$itemcode, $name, $buying_price, $selling_price, $size, $diameter, $brand, $material, $description, $country_of_origin, $ministry_code, $id];
 db_execute(
     $conn,
     "UPDATE item SET item_code=?, name=?, buying_price=?, selling_price=?, size=?, diameter=?, brand=?, material=?, description=?, country_of_origin=?, ministry_code=? WHERE item_id=?",
-    "sssssssssssi",
-    [$itemcode, $name, $buying_price, $selling_price, $size, $diameter, $brand, $material, $description, $country_of_origin, $ministry_code, $id]
+    str_repeat('s', count($item_params) - 1) . 'i',
+    $item_params
 );
 echo "<td>".h($itemcode)."</td>";
 echo "<td>".h($name)."</td>";

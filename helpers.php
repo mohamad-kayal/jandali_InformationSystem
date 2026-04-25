@@ -28,7 +28,8 @@ function db_execute($conn, $sql, $types = '', $params = [])
 
 	if ($types !== '' && !empty($params)) {
 		$refs = [$types];
-		for ($i = 0; $i < count($params); $i++) {
+		$param_count = count($params);
+		for ($i = 0; $i < $param_count; $i++) {
 			$refs[] = &$params[$i];
 		}
 		call_user_func_array([$stmt, 'bind_param'], $refs);
