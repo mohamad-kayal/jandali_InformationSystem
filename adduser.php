@@ -33,8 +33,8 @@ window.location.replace("index.php");
 <?php
 if(isset($_POST['save'])){
   $username=request_value($_POST, 'username');
-  $password=$_POST['password'];
-  $password1=$_POST['password1'];
+  $password=request_value($_POST, 'password');
+  $password1=request_value($_POST, 'password1');
   $address=request_value($_POST, 'address');
   $phone__number=request_value($_POST, 'phonenumber');
   $role_id=request_int($_POST, 'typeofuser');

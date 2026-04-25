@@ -39,6 +39,7 @@ A PHP/MySQL point-of-sale and inventory system for Jandali Co. It supports suppl
    cp .env.example .env
    ```
 2. Update `.env` with your local database credentials.
+   Use `APP_ENV=development` locally if you want detailed database connection errors.
 3. Create a database matching `DB_NAME`.
 4. Import `database_schema.sql` as a starting schema, then adjust column types/indexes if you already have production data.
 5. Serve the repository from your PHP web server document root.

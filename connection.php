@@ -33,7 +33,9 @@ $conn = mysqli_connect(
 );
 
 if (!$conn) {
-	die('Database connection failed: ' . mysqli_connect_error());
+	error_log('Database connection failed: ' . mysqli_connect_error());
+	$message = getenv('APP_ENV') === 'development' ? 'Database connection failed: ' . mysqli_connect_error() : 'Database connection failed.';
+	die($message);
 }
 
 mysqli_set_charset($conn, 'utf8mb4');

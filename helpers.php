@@ -18,6 +18,10 @@ function request_int($source, $key, $default = 0)
 	]);
 }
 
+/**
+ * Prepare and execute a SQL statement with optional bound parameters.
+ * Returns the statement handle on success or false on failure.
+ */
 function db_execute($conn, $sql, $types = '', $params = [])
 {
 	$stmt = mysqli_prepare($conn, $sql);
@@ -38,6 +42,10 @@ function db_execute($conn, $sql, $types = '', $params = [])
 	return $stmt;
 }
 
+/**
+ * Execute a SQL query and return the first row as an associative array.
+ * Returns null when the query fails or no row is found.
+ */
 function db_fetch_assoc($conn, $sql, $types = '', $params = [])
 {
 	$stmt = db_execute($conn, $sql, $types, $params);

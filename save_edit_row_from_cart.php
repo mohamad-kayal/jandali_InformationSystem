@@ -7,7 +7,7 @@ $quantity = request_int($_GET, 'quantity', 1);
 
 if ($id <= 0 || $quantity <= 0) {
     http_response_code(400);
-    echo 'Invalid cart update';
+    echo 'Invalid cart ID or quantity';
     exit;
 }
 
@@ -20,7 +20,7 @@ switch ($type_of_cart) {
         break;
     default:
         http_response_code(400);
-        echo 'Invalid cart update';
+        echo 'Invalid cart type';
         exit;
 }
 echo h($quantity);
